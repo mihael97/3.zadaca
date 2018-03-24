@@ -1,6 +1,5 @@
 package hr.fer.zemris.java.hw03.prob1;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -78,7 +77,6 @@ public class Lexer {
 			}
 		}
 
-		System.out.println(Arrays.toString(data));
 		currentIndex = 0;
 	}
 
@@ -98,7 +96,11 @@ public class Lexer {
 		elements.add('#');
 		elements.add(';');
 
-		return elements.contains(c);
+		if (c == '.' || c == '-' || c == '!' || c == '?' || c == '#' || c == ';') {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -136,39 +138,31 @@ public class Lexer {
 					currentIndex++;
 					return new Token(TokenType.WORD, pom);
 				} else if (pom.length() != 0) {
-					return new Token(TokenType.WORD, pom);
+					return new Token(TokenType.WORD, pom); // saljemo ostatak ako postoji
 				}
 			}
 
 			Character c = null;
-			System.out.println("Trenutni znak:" + data[currentIndex] + ",pocetak: " + currentIndex);
 			if ((c = checkSymbol(currentIndex)) != null) {
 				currentIndex++;
-				System.out.println("Generiram simbol: " + c);
-				System.out.println("Nakon generiraja: " + currentIndex);
 				token = new Token(TokenType.SYMBOL, c);
 			} else if ((c = checkLetter(currentIndex)) != null) {
-				System.out.println("Nakon generiranja znaka " + c + " " + currentIndex);
 
 				String pom = "" + c;
 				while ((c = checkLetter(currentIndex)) != null) {
-					System.out.println("Znak " + c + " " + currentIndex);
 
 					pom += c;
 				}
 
-				System.out.println("Generiram: " + pom);
 				token = new Token(TokenType.WORD, pom);
 			} else if (Character.isDigit(data[currentIndex])) {
 				String pom = "" + data[currentIndex++];
 
 				while (Character.isDigit(data[currentIndex])) {
-					System.out.println("Generiram " + data[currentIndex] + " na indexu: " + currentIndex);
 					pom += data[currentIndex++];
 				}
 
 				try {
-					System.out.println("Generiram: " + pom);
 					token = new Token(TokenType.NUMBER, Long.parseLong(pom));
 
 				} catch (Exception e) {
@@ -220,7 +214,6 @@ public class Lexer {
 	private Character checkLetter(int index) {
 		if (Character.isLetter(data[index])) {
 			currentIndex++;
-			System.out.println("Vracam " + data[index]);
 			return data[index];
 		} else if (checkDigit(data[index])) {
 			currentIndex += 2;
@@ -243,14 +236,11 @@ public class Lexer {
 	 */
 	private boolean checkToken(char c) {
 		// TODO Auto-generated method stub
-		LinkedList<Character> elements = new LinkedList<>();
-		elements.add(' ');
-		elements.add('\r');
-		elements.add('\n');
-		elements.add('\t');
-		elements.contains(' ');
+		if (c == ' ' || c == '\r' || c == '\n' || c == '\t' || c == ' ') {
+			return true;
+		}
 
-		return elements.contains(c);
+		return false;
 	}
 
 	/**

@@ -1,9 +1,26 @@
 package hr.fer.zemris.java.custom.scripting.elems;
 
+/**
+ * Razred koji implementira operator
+ * 
+ * @author Mihael
+ *
+ */
 public class ElementOperator extends Element {
+	/**
+	 * Varijabla gdje pohranjujemo operator u obliku Stringa
+	 */
 	private String symbol;
 
-	public  ElementOperator(String value) {
+	/**
+	 * Konstruktor koji inicijalizira operator s kojim se obavljaju racunale
+	 * operacije
+	 * 
+	 * @param value
+	 * @throws NullPointerException
+	 *             - ako je vrijednost null
+	 */
+	public ElementOperator(String value) {
 		// TODO Auto-generated constructor stub
 		if (value == null) {
 			throw new NullPointerException("Vrijednost je null!");
