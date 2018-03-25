@@ -14,7 +14,7 @@ public class ElementOperator extends Element {
 
 	/**
 	 * Konstruktor koji inicijalizira operator s kojim se obavljaju racunale
-	 * operacije
+	 * operacije. Podrzani operatori su +,-,/,%,* i ^
 	 * 
 	 * @param value
 	 * @throws NullPointerException
@@ -28,6 +28,11 @@ public class ElementOperator extends Element {
 		this.symbol = value;
 	}
 
+	/**
+	 * Metoda vraca operator u obliku Stringa
+	 * 
+	 * @return String
+	 */
 	@Override
 	public String asText() {
 		// TODO Auto-generated method stub

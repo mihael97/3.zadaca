@@ -18,7 +18,7 @@ public class Node {
 	 * Metoda koja dodaje dijete u kolekciju(polje)
 	 * 
 	 * @param child
-	 *            - dijete koje zelimo dodati
+	 *            - dijete koje zelimo dodati,ne smije biti null!
 	 */
 	public void addChildNode(Node child) {
 		if (collection == null) {

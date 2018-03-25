@@ -1,7 +1,9 @@
 package hr.fer.zemris.java.custom.scripting.elems;
 
 /**
- * Razred koji implementira double vrijednost
+ * Razred koji implementira double vrijednost. Nasljeduje razred Element od kuda
+ * overridea metodu za ispis asText. Konstruktor prima samo primitivnu double
+ * vrijednost
  * 
  * @author Mihael
  *
@@ -23,7 +25,13 @@ public class ElementConstantDouble extends Element {
 		this.value = value;
 	}
 
+	/**
+	 * Metoda vraca primitivnu vrijednost doublea u obliku Stinga
+	 * 
+	 * @return String
+	 */
 	@Override
+
 	public String asText() {
 		// TODO Auto-generated method stub
 		return Double.valueOf(value).toString();

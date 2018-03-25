@@ -1,7 +1,7 @@
 package hr.fer.zemris.java.custom.scripting.elems;
 
 /**
- * Razred koji implementira neki zapis slova u obliku Stringa
+ * Razred koji implementira neki konstantan zapis znakova u obliku Stringa
  * 
  * @author Mihael
  *
@@ -28,10 +28,15 @@ public class ElementString extends Element {
 		this.value = value;
 	}
 
+	/**
+	 * Metoda vraca String u jednakom obliku
+	 * 
+	 * @return String
+	 */
 	@Override
 	public String asText() {
 		// TODO Auto-generated method stub
-		return value;
+		return "\""+value+"\"";
 	}
 
 }

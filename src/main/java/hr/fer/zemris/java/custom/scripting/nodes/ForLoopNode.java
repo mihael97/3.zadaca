@@ -4,7 +4,9 @@ import hr.fer.zemris.java.custom.scripting.elems.Element;
 import hr.fer.zemris.java.custom.scripting.elems.ElementVariable;
 
 /**
- * Razred koji predstavlja for petlju i nasljeduje klasu Node
+ * Razred koji predstavlja for petlju i nasljeduje klasu Node. Varijable su
+ * naziv varijable,pocetni izraz,zavrsni izraz i izraz koji predstavlja korak.
+ * Prve tri vrijednosti ne mogu biti null,dok cetvrta moze
  * 
  * @author Mihael
  *
@@ -31,9 +33,16 @@ public class ForLoopNode extends Node {
 	 * Javni konstruktor koji inicijalizira sve varijable
 	 * 
 	 * @param variable
+	 *            - naziv varijable
 	 * @param startExpression
+	 *            - pocetni izraz
 	 * @param endExpression
+	 *            - zavrsni izraz
 	 * @param stepExpression
+	 *            - izraz koji predstavlja korak
+	 * 
+	 * @throws NullPointerException
+	 *             - ako je jedan od prva tri izraza null
 	 */
 	public ForLoopNode(ElementVariable variable, Element startExpression, Element endExpression,
 			Element stepExpression) {
@@ -42,14 +51,22 @@ public class ForLoopNode extends Node {
 			throw new NullPointerException("Jedan od predanih argumenata je null!");
 		}
 
+		System.out.println("Ispis FOR loopa: ");
 		this.variable = variable;
+		System.out.println("Naziv: " + variable.asText());
 		this.startExpression = startExpression;
+		System.out.println("Pocetni :" + startExpression.asText());
 		this.endExpression = endExpression;
+		System.out.println("Zavrsni: " + endExpression.asText());
 		this.stepExpression = stepExpression;
+
+		if (stepExpression != null) {
+			System.out.println("Korak: " + stepExpression.asText());
+		}
 	}
 
 	/**
-	 * Metoda koja vraca vrijednost varijable
+	 * Metoda koja vraca naziv varijable
 	 * 
 	 * @return {@link ElementVariable}
 	 */
@@ -60,7 +77,7 @@ public class ForLoopNode extends Node {
 	/**
 	 * Metoda koja vraca pocetni izraz
 	 * 
-	 * @return Element
+	 * @return {@link Element}
 	 */
 	public Element getStartExpression() {
 		return startExpression;
@@ -69,16 +86,16 @@ public class ForLoopNode extends Node {
 	/**
 	 * Metoda koja vraca zavrsni izraz
 	 * 
-	 * @return Element
+	 * @return {@link Element}
 	 */
 	public Element getEndExpression() {
 		return endExpression;
 	}
 
 	/**
-	 * Metoda koja vraca izraz
+	 * Metoda koja vraca izraz koji predstavlja korak
 	 * 
-	 * @return
+	 * @return {@link Element}
 	 */
 	public Element getStepExpression() {
 		return stepExpression;

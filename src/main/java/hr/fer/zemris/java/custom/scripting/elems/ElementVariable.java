@@ -1,7 +1,8 @@
 package hr.fer.zemris.java.custom.scripting.elems;
 
 /**
- * Razred koji predstavlja varijablu sa svojim nazivom
+ * Razred koji predstavlja varijablu sa svojim nazivom. Vrijednost mora zapoceti
+ * slovom,te se data mogu nanodati slova,brojevi i povlake u neogranicenom broj
  * 
  * @author Mihael
  *
@@ -29,6 +30,11 @@ public class ElementVariable extends Element {
 		}
 	}
 
+	/**
+	 * Metoda vraca naziv varijable u obliku Stringa
+	 * 
+	 * @return String
+	 */
 	@Override
 	public String asText() {
 		// TODO Auto-generated method stub

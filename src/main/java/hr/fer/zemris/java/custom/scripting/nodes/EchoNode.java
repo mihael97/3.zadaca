@@ -6,7 +6,7 @@ import hr.fer.zemris.java.custom.scripting.elems.Element;
 
 /**
  * Razred koji implementira naredbu koja stvara neki izlaz. Nasljeduje klasu
- * Node
+ * Node. Sadrzi polje Elementa
  * 
  * @author Mihael
  *
@@ -26,12 +26,18 @@ public class EchoNode extends Node {
 	public EchoNode(Element[] elements) {
 		super();
 		this.elements = Arrays.copyOf(elements, elements.length);
+		
+		System.out.println("Ispis Echo noda");
+		
+		for(Element ele:elements) {
+			System.out.println(ele.asText());
+		}
 	}
 
 	/**
 	 * Metoda koja vraca sve elemente u obliku polje Elemenata
 	 * 
-	 * @return element[]
+	 * @return Element[]
 	 */
 	public Element[] getElements() {
 		return elements;

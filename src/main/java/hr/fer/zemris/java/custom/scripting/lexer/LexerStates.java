@@ -8,11 +8,18 @@ package hr.fer.zemris.java.custom.scripting.lexer;
  */
 public enum LexerStates {
 	/**
-	 * Stanje kada lexer radi na obradi izraza koji predstavlja neku funkciju
+	 * Stanje kada lexer obraduje for petlju
 	 */
-	FUNCTION,
+	FORLOOP,
+
 	/**
-	 * Stanje rada kada lexer ne obraduje funkciju
+	 * Stanje kada lexer obraduje naredbu koja generira neki ispis dinamicki
 	 */
-	NONFUNCTION;
+	ECHO,
+	/**
+	 * Stanje rada kada lexer ne obraduje nikakav funkcijski izraz nego promatra
+	 * samo Stringove
+	 */
+	NONTAG;
+
 }

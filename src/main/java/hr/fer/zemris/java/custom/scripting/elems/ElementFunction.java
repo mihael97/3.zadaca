@@ -1,7 +1,9 @@
 package hr.fer.zemris.java.custom.scripting.elems;
 
 /**
- * Razred koji implementira funkciju s varijablom za naziv
+ * Razred koji implementira funkciju s varijablom za naziv. Vrijednost mora
+ * zapoceti slovom,te se data mogu nanodati slova,brojevi i povlake u
+ * neogranicenom broj
  * 
  * @author Mihael
  *
@@ -13,7 +15,7 @@ public class ElementFunction extends Element {
 	private String name;
 
 	/**
-	 * Konstruktor koji inicijalizira naziv funkcije
+	 * Konstruktor koji inicijalizira naziv funkcije. u
 	 * 
 	 * @param value
 	 *            - naziv funkcije
@@ -28,9 +30,14 @@ public class ElementFunction extends Element {
 		this.name = value;
 	}
 
+	/**
+	 * Metoda koja vraca naziv funkacije u obliku Stringa
+	 * 
+	 * @return String
+	 */
 	@Override
 	public String asText() {
 		// TODO Auto-generated method stub
-		return name;
+		return "@"+name;
 	}
 }

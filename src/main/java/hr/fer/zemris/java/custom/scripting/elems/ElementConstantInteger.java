@@ -23,6 +23,11 @@ public class ElementConstantInteger extends Element {
 		this.value = value;
 	}
 
+	/**
+	 * Metoda vraca primitivnu vrijednost integera u obliku Stringa
+	 * 
+	 * @return String
+	 */
 	@Override
 	public String asText() {
 		// TODO Auto-generated method stub

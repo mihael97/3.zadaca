@@ -6,7 +6,7 @@ package hr.fer.zemris.java.custom.scripting.nodes;
  * @author Mihael
  *
  */
-public class TextNode {
+public class TextNode extends Node {
 	/**
 	 * Privatna varijabla koja sprema tekst
 	 */
