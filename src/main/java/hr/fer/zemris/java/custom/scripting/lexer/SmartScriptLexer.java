@@ -1,7 +1,5 @@
 package hr.fer.zemris.java.custom.scripting.lexer;
 
-import hr.fer.zemris.java.custom.scripting.parser.SmartScriptParserException;
-
 /**
  * Razred koji implementira lexer kojim prozivodimo tokene koje kasnije
  * koristimo za stvaranje elemenata,a kasnije i cvorova. Konstruktoru je za
@@ -40,10 +38,8 @@ public class SmartScriptLexer {
 		super();
 
 		if (input == null || input.length() == 0) {
-			throw new SmartScriptParserException("Duljina niza je 0 ili je sam argument null");
+			throw new LexerException("Duljina niza je 0 ili je sam argument null");
 		}
-
-		System.out.println("Input = " + input);
 
 		this.input = cleanArray(input);
 
@@ -52,75 +48,67 @@ public class SmartScriptLexer {
 	}
 
 	/**
-	 * Metoda cijim se pozivanjem izraduje sljedeci token i vraca u obliku Stringa.
-	 * U parseru se tada odlucuje sto ce ta vrijednost predstavljati,ovisno o nacinu
-	 * rada
+	 * Metoda cijim se pozivanjem izraduje sljedeci token i vraca u obliku
+	 * {@link Token}. U parseru se tada odlucuje sto ce ta vrijednost
+	 * predstavljati,ovisno o nacinu rada
 	 * 
-	 * @return String kao token i vrijednost sljedeceg elementa
+	 * @return Token kao token
 	 */
-	public String getToken() {
-		try {
-			String pom = "";
-			if (arrayIndex < input.length) {
-				cleanSpaces();
+	public Token getToken() {
+		if (arrayIndex + 1 < input.length) {
+			char inputChar = input[arrayIndex];
+			Token pom = null;
 
-				char inputChar = input[arrayIndex];
+			if (inputChar == '{' && input[arrayIndex + 1] == '$') { // pocetak ili kraj funkcije
 
-				if (state == LexerStates.FORLOOP || state == LexerStates.ECHO) {
-					pom += functionWork();
-				}
-
-				else if (inputChar == '{' && input[arrayIndex + 1] == '$') {
+				if (!isEnd()) {
+					pom = new Token(TypeToken.TAGSTART,
+							new StringBuilder().append(inputChar).append(input[++arrayIndex]).toString());
 					arrayIndex++;
-					if (!checkEnd()) {
-						pom += functionWork();
-					} else {
-						arrayIndex += 6;
-						pom += "{$END$}";
-					}
 				} else {
-					pom = textRead();
+
+					pom = new Token(TypeToken.END, "{$END$}");
+					arrayIndex += 7;
 				}
+
 			}
 
-			if (pom.equals("")) {
-				return null;
-			} else {
-				return pom;
+			else if (state == LexerStates.TAG) {
+				pom = functionWork();
 			}
 
-		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("POGRESKA!!");
+			else {
 
+				pom = new Token(TypeToken.TEXT, readText());
+			}
+
+			return pom;
+		} else {
 			return null;
 		}
 	}
 
 	/**
-	 * Metoda koja cita znakove ako se lexer nalazi u stanju NONTAG
-	 * {@link LexerStates}-a. Kada se dode do dijela koju nagovjesta promjenu
-	 * stanja,metoda prekida citanje i vraca do sada procitani sadrzaj
+	 * Metoda koja cita tekst ukoliko se lexer nalazi van tagova. Nakon sto se
+	 * pojavi znak '{',metoda salje do tada procitani sadrzaj
 	 * 
-	 * @return
+	 * @return String
 	 */
-	private String textRead() {
-		char inputChar = input[arrayIndex];
-		StringBuilder builder = new StringBuilder().append(inputChar);
-		arrayIndex++;
+	private String readText() {
+		StringBuilder builder = new StringBuilder();
+		char inputChar;
 
-		while (arrayIndex < input.length) {
-			inputChar = input[arrayIndex];
-
-			if (inputChar == '\\') {
+		while ((inputChar = input[arrayIndex]) != '{') {
+			if (inputChar == '\\' && (input[arrayIndex + 1] == '\\' || input[arrayIndex + 1] == '{')) {
 				builder.append(input[++arrayIndex]);
-				System.out.println("Zapisujem: " + input[arrayIndex]);
-				arrayIndex++;
-			} else if (inputChar == '{' && input[arrayIndex + 1] == '$') {
-				break;
 			} else {
-				if (inputChar != ' ')
-					builder.append(inputChar);
+				builder.append(inputChar);
+			}
+
+			if ((arrayIndex + 1) != input.length) {
 				arrayIndex++;
+			} else {
+				break;
 			}
 		}
 
@@ -128,81 +116,159 @@ public class SmartScriptLexer {
 	}
 
 	/**
-	 * Metoda koja provjerava da li se doslo do podatka({$END$}) o zavrsteku
-	 * nepraznog taga(npr for petlja)
+	 * Metoda koja provjerava sljedi li tag za zavrsetak nepraznog taga
 	 * 
-	 * @return true ako je doslo do kraja,inace false
+	 * @return true ako sljedi,inace false
 	 */
-	private boolean checkEnd() {
-		// {$END$} -1 5
-		String string = "";
+	private boolean isEnd() {
+		String end = "{$END$}";
+		int index = arrayIndex;
+		int i = 0;
+		int length = input.length;
 
-		for (int i = -1; i <= 5; i++) {
-			string += input[arrayIndex + i];
+		while ((index < length)) {
+			char c = input[index++];
+			if (c != ' ') {
+				if (end.charAt(i) == Character.toUpperCase(c)) {
+					if (++i == 6) {
+						break;
+					}
+				} else {
+					return false;
+				}
+			}
 		}
 
-		return string.equals("{$END$}");
+		return true;
 	}
 
 	/**
 	 * Metoda koja racuna sljedeci token u slucaju da se lexer nalazi u stanju kada
-	 * vrijede druga leksicka pravila
+	 * vrijede druga leksicka pravila(stanje TAG)
 	 * 
-	 * @return String kao sljedeci token
+	 * @return {@link Token} kao sljedeci token
 	 */
-	private String functionWork() {
-		// TODO Auto-generated method stub
+	private Token functionWork() {
 		cleanSpaces();
-		char inputChar = input[arrayIndex];
+		char inputChar;
 		StringBuilder pom = new StringBuilder();
 
-		if (inputChar == '$' && state == LexerStates.NONTAG) {
-			arrayIndex++;
-			setState();
-			cleanSpaces();
-		}
-
-		while ((inputChar = input[arrayIndex]) != '}') {
-
+		while ((inputChar = input[arrayIndex]) != ' ') {
 			if (inputChar == '$') {
-				if (pom.toString().length() == 0) {
+				if (pom.length() == 0) {
+					pom.append(inputChar).append('}');
 					arrayIndex += 2;
 				}
 
 				break;
-			}
-
-			else if (inputChar == ' ') {
-				break;
-			}
-
-			else if (inputChar == '"') { // niz
+			} else if (inputChar == '=') {
 				pom.append(inputChar);
 				arrayIndex++;
-
-				while ((inputChar = input[arrayIndex++]) != '"') {
-					pom.append(inputChar);
+				break;
+			} else if (inputChar == '\"') {
+				if (pom.length() == 0) {
+					pom.append(readString());
 				}
 
-				pom.append(inputChar);
 				break;
+			} else {
+				pom.append(inputChar);
+			}
+			arrayIndex++;
+		}
+
+		return makeObject(pom.toString());
+	}
+
+	/**
+	 * Metoda koja cita tekst do pojavljivanje sljedeceg znaka '"'
+	 * 
+	 * @return tekst u obliku Stringa
+	 */
+	private String readString() {
+		char inputChar = input[arrayIndex++];
+		StringBuilder builder = new StringBuilder().append(inputChar);
+
+		while ((inputChar = input[arrayIndex]) != '\"') {
+			if (inputChar == '\\' && (arrayIndex + 1) != input.length) {
+				builder.append(input[++arrayIndex]);
+
+			} else {
+				builder.append(inputChar);
 			}
 
-			else {
-				pom.append(inputChar);
+			if ((arrayIndex + 1) == input.length) {
+				break;
+			} else {
 				arrayIndex++;
 			}
 		}
 
-		if (inputChar == ' ' || inputChar == '"' || inputChar == '$' && pom.toString().length() != 0) {
-			return pom.toString().equals("") ? "" : pom.toString();
-		} else if (inputChar == '$') {
-			state = LexerStates.NONTAG;
-			return "" + inputChar;
-		} else {
-			throw new SmartScriptParserException("Pogreske!");
+		builder.append(inputChar);
+		arrayIndex++;
+		return builder.toString();
+	}
+
+	/**
+	 * Metoda koja stvara prikladan {@link Token} od procitanog sadrzaja
+	 * 
+	 * @param string
+	 *            - procitani sadrzaj
+	 * @return {@link Token} - referenca na token koji se prosljedjuje parseru
+	 */
+	private Token makeObject(String string) {
+		Token forReturn = null;
+		if (string == null) {
+			throw new NullPointerException();
 		}
 
+		else if (string.equals("$}")) {
+			forReturn = new Token(TypeToken.TAGEND, string);
+		}
+
+		else if (string.startsWith("\"")) {
+			forReturn = new Token(TypeToken.STRING, string);
+		}
+
+		else if (Character.isDigit(string.charAt(0))
+				|| string.charAt(0) == '-' && string.length() != 1 && Character.isDigit(string.charAt(1))) {
+			// drugi dio uvjeta ako je negativan broj
+			try {
+				if (string.contains(".")) {
+					forReturn = new Token(TypeToken.DOUBLE, Double.parseDouble(string));
+				} else {
+					forReturn = new Token(TypeToken.INTEGER, Integer.parseInt(string));
+				}
+			} catch (NumberFormatException e) {
+				throw new LexerException("Nemoguce parsirati!");
+			}
+		}
+
+		else if (isOperator(string)) {
+			forReturn = new Token(TypeToken.OPERATOR, string);
+		}
+
+		else if (isFunction(string)) {
+			forReturn = new Token(TypeToken.FUNCTION, string.substring(1, string.length())); // micemo @ iz znaka
+		}
+
+		else {
+			forReturn = new Token(TypeToken.VARIABLE, string);
+		}
+
+		return forReturn;
+	}
+
+	/**
+	 * Metoda provjerava je li funkcija formula,tj da li zapocinje s '@'
+	 * 
+	 * @param string
+	 *            - ulaz kojeg zelimo projeriti
+	 * @return true ako zapocinje,inace false
+	 */
+	private boolean isFunction(String string) {
+		// TODO Auto-generated method stub
+		return string.startsWith("@");
 	}
 
 	/**
@@ -210,21 +276,9 @@ public class SmartScriptLexer {
 	 * ulazu(niz FOR aktivira nacin rada FORLOOP,a niz '=' aktivira echo nacin.
 	 * Inace je nacin NONTAG
 	 */
-	private void setState() {
-		// TODO Auto-generated method stub
-		cleanSpaces();
-		char inputChar;
-		StringBuilder functionName = new StringBuilder();
-
-		while ((inputChar = input[arrayIndex]) != ' ') {
-			functionName.append(inputChar);
-			arrayIndex++;
-		}
-
-		if (functionName.toString().toUpperCase().equals("FOR")) {
-			state = LexerStates.FORLOOP;
-		} else if (functionName.toString().equals("=")) {
-			state = LexerStates.ECHO;
+	public void setState() {
+		if (state == LexerStates.NONTAG) {
+			state = LexerStates.TAG;
 		} else {
 			state = LexerStates.NONTAG;
 		}
@@ -241,13 +295,29 @@ public class SmartScriptLexer {
 	}
 
 	/**
-	 * Metoda vraca trenutno stanje u kojem se lexer nalazi(FOR,ECHO ili NONTAG)
+	 * Metoda vraca trenutno stanje u kojem se lexer nalazi(TAG ili NONTAG)
 	 * 
-	 * @return {@link LexerStates}
+	 * @return {@link LexerStates} - trenutno stanje
 	 */
 	public LexerStates getState() {
 		// TODO Auto-generated method stub
 		return state;
+	}
+
+	/**
+	 * Metoda provjerava da li je zadani argument operator(+,-,/,^)
+	 *
+	 * @param operator
+	 *            - operator u obliku string koji zelimo provjeriti
+	 * @return true ako je,inace false
+	 */
+	private boolean isOperator(String operator) {
+		if (operator.equals("+") || operator.equals("-") || operator.equals("/") || operator.equals("^")
+				|| operator.equals("*")) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -256,9 +326,10 @@ public class SmartScriptLexer {
 	 * 
 	 * @param string
 	 *            - ulazni niz zadan preko argumenta konstruktora
-	 * @return - "cisti niz"
+	 * @return - "cisti niz",niz od kojeg kasnije krecemo u leksicku analizu i
+	 *         proizvodnju tokena
 	 * 
-	 * @throws SmartScriptParserException
+	 * @throws LexerException
 	 *             - ako se nadu znakovi u nedozvoljenom rasporedu
 	 */
 	private char[] cleanArray(String string) {
@@ -271,34 +342,40 @@ public class SmartScriptLexer {
 
 			if (tags == false) {
 				if (array[i] == '\\') {
-					if (array[i + 1] == '\\' || array[i + 1] == '{') {
+					if (((i + 1) != length && (array[i + 1] == '{' || array[i + 1] == '\\'))) {
+						builder.append(array[i]);
 						i++;
 					} else {
-						throw new SmartScriptParserException("Pogreska kod dijela '\\' na indexu "+i);
+						throw new LexerException("Pogreska kod dijela '\\' na indexu " + i);
 					}
 				} else if (array[i] == '{') {
-					if (array[i + 1] == '$') {
+					if ((i + 1) != length && array[i + 1] == '$') {
 						tags = true;
 					} else {
-						throw new SmartScriptParserException("Pogreska kod '{' na indexu "+i);
+						throw new LexerException("Pogreska kod '{' na indexu " + i);
 					}
 
 				}
 
 			} else {
-				if (array[i] == '\\') {
-					if (array[i + 1] == '\\' || array[i + 1] == '\"') {
+				if (array[i] == '\\' && (i + 1) != length) {
+					if (array[i + 1] == '\\') {
+						builder.append(array[i]);
+						i++;
+					} else if (array[i + 1] == '\"') {
+						builder.append(array[i]);
 						i++;
 					} else {
-						throw new SmartScriptParserException("Pogreska kod '\\' na indexu "+i);
+						throw new LexerException("Pogreska kod '\\' na indexu " + i);
 					}
 				} else if (array[i] == '}') {
-					if (array[i - 1] == '$') {
+					if ((i - 1) != 0 && array[i - 1] == '$') {
 						tags = false;
+					} else {
+						throw new LexerException("Pogreska kod '}' na indexu " + i);
 					}
-					else {
-						throw new SmartScriptParserException("Pogreska kod '}' na indexu "+i);
-					}
+				} else if (array[i] == '{') {
+					throw new LexerException("Tag unutar taga!");
 				}
 
 			}

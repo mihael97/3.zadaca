@@ -1,0 +1,1 @@
+{$ FOR year @sin 10 $} {$end$}

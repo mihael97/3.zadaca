@@ -22,7 +22,7 @@ public class Node {
 	 */
 	public void addChildNode(Node child) {
 		if (collection == null) {
-			collection = new ArrayIndexedCollection(2);
+			collection = new ArrayIndexedCollection();
 		}
 
 		collection.add(child);
@@ -34,6 +34,8 @@ public class Node {
 	 * @return int - broj djece
 	 */
 	public int numberOfChildren() {
+		if(collection==null)
+			return 0;
 		return collection.size();
 	}
 

@@ -36,7 +36,28 @@ public class ElementString extends Element {
 	@Override
 	public String asText() {
 		// TODO Auto-generated method stub
-		return "\""+value+"\"";
+		return value;
+	}
+
+	/**
+	 * Metoda koja pretvara vrijednost elementa u zapis procitan sa ulaza. Takav
+	 * zapis je pogodan za parsiranje
+	 * 
+	 * @return zapis vrijednosti elemnta u obliku pogodnom za parser
+	 */
+	public String forParse() {
+		char[] array = value.toCharArray();
+		StringBuilder builder = new StringBuilder();
+
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] == '\\' || array[i] == '\"' && i != 0 && i != (array.length - 1)) {
+				builder.append("\\");
+			}
+
+			builder.append(array[i]);
+		}
+
+		return builder.toString();
 	}
 
 }

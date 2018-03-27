@@ -28,7 +28,30 @@ public class TextNode extends Node {
 	 * @return String
 	 */
 	public String getText() {
-		return text;
+		return prepareForOutput();
+	}
+
+	/**
+	 * Metoda koja pretvara vrijednost elementa u oblik koji je pogodan za
+	 * parsiranje
+	 * 
+	 * @return vrijednost cvora u obliku pogodnom za parser
+	 */
+	public String prepareForOutput() {
+		StringBuilder builder = new StringBuilder();
+		char[] array = text.toCharArray();
+
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] == '\\') {
+				builder.append(array[i]);
+			} else if (array[i] == '{') {
+				builder.append("\\");
+			}
+
+			builder.append(array[i]);
+		}
+
+		return builder.toString();
 	}
 
 }

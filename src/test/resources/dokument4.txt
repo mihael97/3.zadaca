@@ -1,0 +1,7 @@
+Ovo je FOR petlja {$ FOR i i 10$}
+	Ovo je echo tag {$  = "Echo tag"$}
+Ovo je text u FOR petlji {$ FOR a 3  6 $} 
+	Tekst
+{$ END$}
+
+{$ END $}

@@ -1,0 +1,1 @@
+{$= "Mihael" "Macuka" 8 9 1 0 $}{$eNd$}

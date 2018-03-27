@@ -2,16 +2,28 @@ package hr.fer.zemris.java.hw03.prob1;
 
 /**
  * Javni enum smogucim tipovima podataka
+ * 
  * @author ime
  *
  */
 public enum TokenType {
-	@SuppressWarnings("javadoc")
+	/**
+	 * Oznaka koja predstavlja token za kraj datoteke
+	 */
 	EOF,
-	@SuppressWarnings("javadoc")
-	WORD, 
-	@SuppressWarnings("javadoc")
-	NUMBER, 
-	@SuppressWarnings("javadoc")
+
+	/**
+	 * Oznaka tokena koji predstavlja rijec
+	 */
+	WORD,
+
+	/**
+	 * Oznaka tokena koja predstavlja broj(cijelobrojni ili decimalni)
+	 */
+	NUMBER,
+
+	/**
+	 * Oznaka tokena koja predstavlja simbol
+	 */
 	SYMBOL
 }

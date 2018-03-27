@@ -14,10 +14,11 @@ public class Proba {
 		String docBody;
 		try {
 			docBody = new String(Files.readAllBytes(Paths.get(args[0])), StandardCharsets.UTF_8);
-			SmartScriptParser parser = new SmartScriptParser(docBody) ;
+			SmartScriptParser lexer = new SmartScriptParser(docBody);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.err.println("Pogreska u probi!");
 		}
 	}
 }

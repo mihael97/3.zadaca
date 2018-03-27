@@ -1,24 +1,20 @@
 package hr.fer.zemris.java.custom.scripting.lexer;
 
 /**
- * Javni enum koji sadrzi moguca stanja rada lexera
+ * Javni enum koji sadrzi moguca stanja rada lexera(TAG i NONTAG)
  * 
  * @author Mihael
  *
  */
 public enum LexerStates {
-	/**
-	 * Stanje kada lexer obraduje for petlju
-	 */
-	FORLOOP,
 
 	/**
-	 * Stanje kada lexer obraduje naredbu koja generira neki ispis dinamicki
+	 * Nacin rada kada lexer proizvodi tokene unutar tagova
 	 */
-	ECHO,
+	TAG,
+
 	/**
-	 * Stanje rada kada lexer ne obraduje nikakav funkcijski izraz nego promatra
-	 * samo Stringove
+	 * Nacin rada lexera kada proizvodi tokene van tagova
 	 */
 	NONTAG;
 

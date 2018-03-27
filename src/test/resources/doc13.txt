@@ -1,0 +1,1 @@
+{$ FOR a "Mihael \"Macuka\" Ja" 1 $} Ja sam nezatvorena

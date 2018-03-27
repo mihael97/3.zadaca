@@ -2,6 +2,7 @@ package hr.fer.zemris.java.custom.scripting.nodes;
 
 import hr.fer.zemris.java.custom.scripting.elems.Element;
 import hr.fer.zemris.java.custom.scripting.elems.ElementVariable;
+import hr.fer.zemris.java.custom.scripting.parser.SmartScriptParserException;
 
 /**
  * Razred koji predstavlja for petlju i nasljeduje klasu Node. Varijable su
@@ -48,21 +49,13 @@ public class ForLoopNode extends Node {
 			Element stepExpression) {
 		super();
 		if (variable == null || startExpression == null || endExpression == null) {
-			throw new NullPointerException("Jedan od predanih argumenata je null!");
+			throw new SmartScriptParserException("Jedan od predanih argumenata je null!");
 		}
 
-		System.out.println("Ispis FOR loopa: ");
 		this.variable = variable;
-		System.out.println("Naziv: " + variable.asText());
 		this.startExpression = startExpression;
-		System.out.println("Pocetni :" + startExpression.asText());
 		this.endExpression = endExpression;
-		System.out.println("Zavrsni: " + endExpression.asText());
 		this.stepExpression = stepExpression;
-
-		if (stepExpression != null) {
-			System.out.println("Korak: " + stepExpression.asText());
-		}
 	}
 
 	/**
@@ -99,6 +92,25 @@ public class ForLoopNode extends Node {
 	 */
 	public Element getStepExpression() {
 		return stepExpression;
+	}
+
+	/**
+	 * Metoda koja vraca ispis FORN u prihvatljivom obliku
+	 * 
+	 * @return String kao ispis FOR petlje
+	 */
+	@Override
+	public String toString() {
+		StringBuilder string = new StringBuilder().append("{$ FOR ").append(variable.asText())
+				.append(" " + startExpression.asText()).append(" " + endExpression.asText() + " ");
+
+		if (stepExpression != null) {
+			string.append(stepExpression.asText() + " ");
+		}
+
+		string.append("$}");
+
+		return string.toString();
 	}
 
 }

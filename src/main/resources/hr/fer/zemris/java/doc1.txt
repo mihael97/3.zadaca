@@ -1,1 +1,0 @@
-{$= Mihael 8.9 "Mihael"$}   {$FOR    a  "ivan" 9$} Mihael {$END$}
