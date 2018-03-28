@@ -27,7 +27,7 @@ public class SmartScriptTester {
 	 */
 	public static void main(String[] args) {
 		String filepath = "src\\test\\resources\\dokument1.txt";
-
+		
 		String docBody = null;
 		try {
 			docBody = new String(Files.readAllBytes(Paths.get(filepath)), StandardCharsets.UTF_8);
@@ -41,7 +41,7 @@ public class SmartScriptTester {
 		String originalDocumentBody = createOriginalDocumentBody(document);
 		SmartScriptParser parser2 = new SmartScriptParser(originalDocumentBody);
 		DocumentNode document2 = parser2.getDocumentNode();
-
+				
 		if (originalDocumentBody.equals(createOriginalDocumentBody(document2))) {
 			System.out.println("Isti su!");
 		} else {
@@ -96,7 +96,7 @@ public class SmartScriptTester {
 			if (child.getChild(i) instanceof ForLoopNode) {
 				builder.append(printForLoop((ForLoopNode) child.getChild(i)));
 			} else if (child.getChild(i) instanceof TextNode) {
-				builder.append(((TextNode) child.getChild(i)).getText());
+				builder.append(((TextNode) child.getChild(i)).prepareForOutput());
 			} else if (child.getChild(i) instanceof EchoNode) {
 				builder.append(((EchoNode) child.getChild(i)).toString());
 			}

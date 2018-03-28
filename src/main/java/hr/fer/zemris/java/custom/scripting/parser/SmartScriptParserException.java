@@ -20,10 +20,23 @@ public class SmartScriptParserException extends RuntimeException {
 	 * 
 	 * @param exp
 	 *            - niz kojeg zelimo ispisati,pojasnjenje
+	 * @param e
 	 */
 	public SmartScriptParserException(String exp) {
-		// TODO Auto-generated constructor stub
 		super(exp);
+	}
+
+	/**
+	 * Javni konstruktor koji kao argumente prima String kao opisnik iznimke i
+	 * referencu na iznimku
+	 * 
+	 * @param message
+	 *            - opisnik iznimke koju smo dobili kao argument
+	 * @param cause
+	 *            - iznimka koja je uzrokavala {@link SmartScriptParserException}
+	 */
+	public SmartScriptParserException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 }

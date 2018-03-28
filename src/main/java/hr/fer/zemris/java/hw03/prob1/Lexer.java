@@ -1,7 +1,5 @@
 package hr.fer.zemris.java.hw03.prob1;
 
-import java.util.LinkedList;
-
 /**
  * Javni razred koji implementira lexer
  * 
@@ -57,7 +55,7 @@ public class Lexer {
 	}
 
 	/**
-	 * Puni polje znakova s znakovima ulaznog izraza
+	 * Metoda koja puni polje znakova sa sadrzajem iz ulaznog zapisa
 	 * 
 	 * @param text
 	 *            - ulazni izraz
@@ -81,21 +79,13 @@ public class Lexer {
 	}
 
 	/**
-	 * Prvjerava je li znak simbol
+	 * Metoda koja provjerava je li zadani argument simbol
 	 * 
 	 * @param c
-	 *            - znak
+	 *            - znak kojeg zelimo provjeriti
 	 * @return true ako je,inace false
 	 */
 	private boolean isSymbol(char c) {
-		LinkedList<Character> elements = new LinkedList<>();
-		elements.add('.');
-		elements.add('-');
-		elements.add('!');
-		elements.add('?');
-		elements.add('#');
-		elements.add(';');
-
 		if (c == '.' || c == '-' || c == '!' || c == '?' || c == '#' || c == ';') {
 			return true;
 		}
@@ -104,12 +94,14 @@ public class Lexer {
 	}
 
 	/**
-	 * Vraca sljedeci token
+	 * Metoda koja vraca sljedeci token koji je grupiran po pravilima ovisno u kojem
+	 * se rezimu rada nalazi lexer
 	 * 
-	 * @return sljedeci token
+	 * @return sljedeci {@link Token}
 	 * 
 	 * @throws LexerException
-	 *             - ako dode do pogreske
+	 *             - ako dode do pogreske(previse puta pozvan nextToken,\ se nalazi
+	 *             ispred slova ili je jedini clan niza)
 	 */
 	public Token nextToken() {
 		Token previousToken = token;
@@ -128,17 +120,17 @@ public class Lexer {
 			} else if (data[currentIndex] == ' ') {
 				currentIndex++;
 			} else if (state == LexerState.EXTENDED) {
-				String pom = "";
+				StringBuilder pom = new StringBuilder();
 
 				while (data[currentIndex] != ' ' && data[currentIndex] != '#') {
-					pom += data[currentIndex++];
+					pom.append(data[currentIndex++]);
 				}
 
 				if (data[currentIndex] != '#') {
 					currentIndex++;
-					return new Token(TokenType.WORD, pom);
+					return new Token(TokenType.WORD, pom.toString());
 				} else if (pom.length() != 0) {
-					return new Token(TokenType.WORD, pom); // saljemo ostatak ako postoji
+					return new Token(TokenType.WORD, pom.toString()); // saljemo ostatak ako postoji
 				}
 			}
 
@@ -146,26 +138,30 @@ public class Lexer {
 			if ((c = checkSymbol(currentIndex)) != null) {
 				currentIndex++;
 				token = new Token(TokenType.SYMBOL, c);
-			} else if ((c = checkLetter(currentIndex)) != null) {
+			}
 
-				String pom = "" + c;
+			else if ((c = checkLetter(currentIndex)) != null) {
+
+				StringBuilder pom = new StringBuilder().append(c);
 				while ((c = checkLetter(currentIndex)) != null) {
 
-					pom += c;
+					pom.append(c);
 				}
 
-				token = new Token(TokenType.WORD, pom);
-			} else if (Character.isDigit(data[currentIndex])) {
-				String pom = "" + data[currentIndex++];
+				token = new Token(TokenType.WORD, pom.toString());
+			}
+
+			else if (Character.isDigit(data[currentIndex])) {
+				StringBuilder pom = new StringBuilder().append(data[currentIndex++]);
 
 				while (Character.isDigit(data[currentIndex])) {
-					pom += data[currentIndex++];
+					pom.append(data[currentIndex++]);
 				}
 
 				try {
-					token = new Token(TokenType.NUMBER, Long.parseLong(pom));
+					token = new Token(TokenType.NUMBER, Long.parseLong(pom.toString()));
 
-				} catch (Exception e) {
+				} catch (NumberFormatException e) {
 					// TODO: handle exception
 					throw new LexerException("Preveliki broj!");
 				}
@@ -194,7 +190,8 @@ public class Lexer {
 	}
 
 	/**
-	 * Metoda provjerava je li znak na poziciji simbol
+	 * Metoda provjera pozivanjem metoda isSymbol da li je znaka na poziciji zadanoj
+	 * preko argumenata simbok
 	 * 
 	 * @param index
 	 *            - pozicija
@@ -205,7 +202,7 @@ public class Lexer {
 	}
 
 	/**
-	 * Provjerava treba li znak staviti u token
+	 * Metoda provjerava treba li znak staviti u token
 	 * 
 	 * @param index
 	 *            - pozicija
@@ -228,7 +225,8 @@ public class Lexer {
 	}
 
 	/**
-	 * Metoda provjerava treba li znak dodati u niz
+	 * Metoda provjerava treba li znak dodati u niz(praznine se ne dodaju u niz,osim
+	 * ako nije razmak izmedu dva tokena)
 	 * 
 	 * @param c
 	 *            - znak kojeg provjeravamo
@@ -246,7 +244,7 @@ public class Lexer {
 	/**
 	 * Metoda koja vraca zadnje generirani token
 	 * 
-	 * @return token
+	 * @return {@link Token}
 	 */
 	public Token getToken() {
 		return token;

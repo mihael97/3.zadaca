@@ -9,6 +9,7 @@ import hr.fer.zemris.java.custom.scripting.elems.ElementFunction;
 import hr.fer.zemris.java.custom.scripting.elems.ElementOperator;
 import hr.fer.zemris.java.custom.scripting.elems.ElementString;
 import hr.fer.zemris.java.custom.scripting.elems.ElementVariable;
+import hr.fer.zemris.java.custom.scripting.lexer.LexerException;
 import hr.fer.zemris.java.custom.scripting.lexer.SmartScriptLexer;
 import hr.fer.zemris.java.custom.scripting.lexer.Token;
 import hr.fer.zemris.java.custom.scripting.lexer.TypeToken;
@@ -48,8 +49,14 @@ public class SmartScriptParser {
 		if (input == null) {
 			throw new NullPointerException("Naziv je null!");
 		}
-		lexer = new SmartScriptLexer(input);
-		getTokens();
+
+		try {
+			lexer = new SmartScriptLexer(input);
+			getTokens();
+		} catch (LexerException e) {
+			throw new SmartScriptParserException(e.getMessage(), e);
+
+		}
 	}
 
 	/**
@@ -123,7 +130,8 @@ public class SmartScriptParser {
 	 */
 	private Token checkID(Token token) {
 
-		if (!token.getValue().toString().trim().equals("=") && !token.getValue().toString().toUpperCase().trim().equals("FOR")) {
+		if (!token.getValue().toString().trim().equals("=")
+				&& !token.getValue().toString().toUpperCase().trim().equals("FOR")) {
 			throw new SmartScriptParserException("Nemoguce prepoznati ime taga!");
 		}
 

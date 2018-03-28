@@ -1,6 +1,7 @@
 package hr.fer.zemris.java.custom.scripting.nodes;
 
 import hr.fer.zemris.java.custom.scripting.elems.Element;
+import hr.fer.zemris.java.custom.scripting.elems.ElementString;
 import hr.fer.zemris.java.custom.scripting.elems.ElementVariable;
 import hr.fer.zemris.java.custom.scripting.parser.SmartScriptParserException;
 
@@ -101,11 +102,32 @@ public class ForLoopNode extends Node {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder string = new StringBuilder().append("{$ FOR ").append(variable.asText())
-				.append(" " + startExpression.asText()).append(" " + endExpression.asText() + " ");
-
+		StringBuilder string = new StringBuilder().append("{$ FOR ").append(variable.asText()).append(" ");
+		
+		if(startExpression instanceof ElementString) {
+			string.append(((ElementString) startExpression).forParse());
+		} else {
+			string.append(startExpression.asText());
+		}
+		
+		string.append(" ");
+		
+		if(endExpression instanceof ElementString) {
+			string.append(((ElementString) endExpression).forParse());
+		} else {
+			string.append(endExpression.asText());
+		}
+		
+		string.append(" ");
+		
 		if (stepExpression != null) {
-			string.append(stepExpression.asText() + " ");
+			if(stepExpression instanceof ElementString) {
+				string.append(((ElementString) stepExpression).forParse());
+			} else {
+				string.append(stepExpression.asText());
+			}
+			
+			string.append(" ");
 		}
 
 		string.append("$}");

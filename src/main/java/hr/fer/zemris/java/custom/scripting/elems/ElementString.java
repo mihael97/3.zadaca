@@ -26,6 +26,7 @@ public class ElementString extends Element {
 			throw new NullPointerException("Vrijednost je null!");
 		}
 		this.value = value;
+				
 	}
 
 	/**

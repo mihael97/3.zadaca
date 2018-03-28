@@ -11,7 +11,7 @@ public enum LexerState {
 	 */
 	BASIC,
 	/**
-	 * Napredni nacin rada
+	 * Napredni nacin rada gdje lexer sve unutar znakova '#' smatram tekstom
 	 */
 	EXTENDED;
 }
