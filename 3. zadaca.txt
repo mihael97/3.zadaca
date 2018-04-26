@@ -1,0 +1,57 @@
+Axilis, Tvrtka (@F0000000030), vrsta: 2. - 5
+
+Jako dobra zadaca.
+Bilo bi dobro maknuti one // TODO poruke, za izgenerirane dijelove, samo cine kod nepreglednijim i dodaju nepotrebne markere u Eclipseu (Window -> Show View -> Markers). Pored toga pohavljujem konzistentnost svih komentara i dokumentacije (bilo bi jos bolje da su na engleskom kad je vec kod na engleskom :)).
+
+
+Milisavljević, Alexandra (0036499702), vrsta: 1. - 4
+
+Na nekim mjestima u javadocu nedostaje dokumentacija iznimki. Takoder, kad zavrsis kod makni to do komentare.
+
+1. zadatak
+U metodi checkToken mogla se koristiti metoda Character.isWhitespace umjesto da svaki slucaj stavljas u if.
+Nema bas smisla pisati provjeru za simbol buduci da je u zadatku zadano da je simbol sve sto nije rijec, broj ili praznina. Ovako ako je znak npr. < program ga nece prepoznati kao nista od navedenog.
+
+2. zadatak
+U metodi isFunction bi mozda trebalo provjeravati pravilnost i ostatka funkcije, ne samo pocinje li s @.
+Escapeanje ne radi ni u tekstu ni u tagu, kad se rekonstruiraju slijedeci primjeri iz zadace sa escapeanjem, vraca opet identican dokument. A tag follows {$= "Joe \"Long\" Smith"$}. Some \\ test X.
+
+Inace sve radi, kod je dobro organiziran i pregledan. Dajem ocjenu 4 jer ne rade primjeri za escape.
+
+
+
+Mišević, Josip (0036493303), vrsta: 1. - 4
+ 
+ Razred Element i svi podrazredi dobro napisani.
+
+Razred Node i svi podrazredi dobro napisani.
+
+Pokretanje parsera:
+U tekstu izvan tagova znak '{' iza kojeg ne slijedi znak '$' izaziva iznimku a trebalo bi se lijepo parsirati jer sam znak '{' ne označava početak taga.
+
+Za unos'{$= i i * @si#n "0.000" @decfmt $}' parser sve isparsira, a ime funkcije 'si#n' nije valjano pa parser triba bacit iznimku.
+
+za unos '{$= i i * @sin "jkl\tkl" @decfmt $}' parser baca iznimku a u tekstu ("jkl\tkl") trebaju biti podržani tabulator (\t) i novi red.
+
+Za unos '{$FOR i 0 "10a" 2 $}' parser sve isparsira a triba bi bacit iznimku jer string "10a" triba parsirat u integer. Ovde to ne može pa treba bacit iznimku, a ne pohrenit to kao tekst. ("Please observe that "-1"10 is OK: is should parse into string and after it into integer.")
+
+Obrazloženje ocjene:
+Cjelokupni dojam zadaća je uredno napisana uz par navedenih pogrešaka zbog kojih je ocjena 4.
+
+
+
+Nimac, Josip (0036490915), vrsta: 1. - 4
+
+Za prvi zadatak nemam zamjerke, sve se čini u redu.
+
+Radiš junit testove za SmartScriptLexer u datoteci SmartScriptParserTest, također 'firstTest'
+je preopširan, junit testovi bi trebali biti kraći.
+
+SmartScriptTester ti radi s hard-codeanim putem do datoteke, a trebalo je omogućiti unos preko
+naredbenog retka.
+Također ako mu se preda u Stringu u FOR-u npr. "Neki text \n nastavak" (ovo \n 
+su u ovom slučaju dva znaka, znači u stringu u javi \\n) onda lexer puca, a
+trebao bi to tretirati kao ASCII 10, znači line feed.
+Također ne prepoznaje se {$END$} tag ako on ima više razmaka npr. {$ 		END   $}.
+
+Ostale moje pripremljene testove prolazi uredno, ali zbog gore navedenih razloga moja ocjena će biti 4.
