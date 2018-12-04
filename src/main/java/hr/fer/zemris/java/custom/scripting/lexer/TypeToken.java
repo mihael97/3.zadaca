@@ -1,65 +1,73 @@
 package hr.fer.zemris.java.custom.scripting.lexer;
 
 /**
- * Enum koji sadrze nazive tokena koji se mogu pojaviti u izrazu temeljem vrste
- * podatka
- * 
- * Moguci tipovi tokena:
- * TAGSTART,TEXT,TAGEND,STRING,DOUBLE,INTEGER,VARIABLE,OPERATOR,FUNCTION,END
- * 
- * 
- * @author Mihael
+ * Enum contains names of tokens which can appear in data
+ * <p>
+ * Possibile tokens are:
+ * <ul>
+ * <li>TAGSTART</li>
+ * <li>TEXT</li>
+ * <li>TAGEND</li>
+ * <li>STRING</li>
+ * <li>DOUBLE</li>
+ * <li>INTEGER</li>
+ * <li>VARIABLE</li>
+ * <li>OPERATOR</li>
+ * <li>FUNCTION</li>
+ * <li>END</li>
+ * </ul>
  *
+ * @author Mihael
  */
 public enum TypeToken {
 
-	/**
-	 * Token koji predstavlja pocetak taga u izrazu
-	 */
-	TAGSTART,
+    /**
+     * Tag start
+     */
+    TAGSTART,
 
-	/**
-	 * Token koji predstavlja tekst izvan tagova
-	 */
-	TEXT,
+    /**
+     * Text outside tags
+     */
+    TEXT,
 
-	/**
-	 * Token koji predstavlja zavrstak taga
-	 */
-	TAGEND,
+    /**
+     * Tag end
+     */
+    TAGEND,
 
-	/**
-	 * Tag koji predstavlja tekst omeden navodnicima unutar tagova
-	 */
-	STRING,
+    /**
+     * Text between quotes in tag
+     */
+    STRING,
 
-	/**
-	 * Token za double vrijednost
-	 */
-	DOUBLE,
+    /**
+     * Double value
+     */
+    DOUBLE,
 
-	/**
-	 * Token za cjelobrojnu vrijednost
-	 */
-	INTEGER,
+    /**
+     * Integer value
+     */
+    INTEGER,
 
-	/**
-	 * Token za matematicke operatore
-	 */
+    /**
+     * Mathematical operators
+     */
 
-	OPERATOR,
-	/**
-	 * Token za funkciju
-	 */
-	FUNCTION,
+    OPERATOR,
+    /**
+     * Function
+     */
+    FUNCTION,
 
-	/**
-	 * Token za varijablu
-	 */
-	VARIABLE,
+    /**
+     * Variable
+     */
+    VARIABLE,
 
-	/**
-	 * Token za kraj nepraznog taga
-	 */
-	END
+    /**
+     * End of non-empty tag
+     */
+    END
 }

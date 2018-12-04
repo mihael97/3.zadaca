@@ -1,57 +1,55 @@
 package hr.fer.zemris.java.custom.scripting.nodes;
 
 /**
- * Razred koji implementira tekstualni podatak i nasljeduje klasu Node
- * 
- * @author Mihael
+ * Textual data
  *
+ * @author Mihael
  */
 public class TextNode extends Node {
-	/**
-	 * Privatna varijabla koja sprema tekst
-	 */
-	private String text;
+    /**
+     * Text in node
+     */
+    private String text;
 
-	/**
-	 * Javni konstruktor koji inicijalizira tekst
-	 * 
-	 * @param text
-	 */
-	public TextNode(String text) {
-		super();
-		this.text = text;
-	}
+    /**
+     * Constructor
+     *
+     * @param text input text
+     */
+    public TextNode(String text) {
+        super();
+        this.text = text;
+    }
 
-	/**
-	 * Metoda koja vraca vrijednost teksta
-	 * 
-	 * @return String
-	 */
-	public String getText() {
-		return prepareForOutput();
-	}
+    /**
+     * Returns text value
+     *
+     * @return String
+     */
+    public String getText() {
+        return prepareForOutput();
+    }
 
-	/**
-	 * Metoda koja pretvara vrijednost elementa u oblik koji je pogodan za
-	 * parsiranje
-	 * 
-	 * @return vrijednost cvora u obliku pogodnom za parser
-	 */
-	public String prepareForOutput() {
-		StringBuilder builder = new StringBuilder();
-		char[] array = text.toCharArray();
+    /**
+     * Converts values of elements in parser acceptable format
+     *
+     * @return node value in parser acceptable format
+     */
+    public String prepareForOutput() {
+        StringBuilder builder = new StringBuilder();
+        char[] array = text.toCharArray();
 
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] == '\\') {
-				builder.append(array[i]);
-			} else if (array[i] == '{') {
-				builder.append("\\");
-			}
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == '\\') {
+                builder.append( array[i] );
+            } else if (array[i] == '{') {
+                builder.append( "\\" );
+            }
 
-			builder.append(array[i]);
-		}
+            builder.append( array[i] );
+        }
 
-		return builder.toString();
-	}
+        return builder.toString();
+    }
 
 }

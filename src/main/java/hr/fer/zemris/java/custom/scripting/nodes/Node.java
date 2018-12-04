@@ -3,51 +3,47 @@ package hr.fer.zemris.java.custom.scripting.nodes;
 import hr.fer.zemris.java.custom.collections.ArrayIndexedCollection;
 
 /**
- * Razred koji implementira clana strukture
- * 
- * @author ime
+ * Node
  *
+ * @author Mihael
  */
 public class Node {
-	/**
-	 * Referenca na kolekciju za pohranu djece
-	 */
-	private ArrayIndexedCollection collection = null;
+    /**
+     * Children collection
+     */
+    private ArrayIndexedCollection collection = null;
 
-	/**
-	 * Metoda koja dodaje dijete u kolekciju(polje)
-	 * 
-	 * @param child
-	 *            - dijete koje zelimo dodati,ne smije biti null!
-	 */
-	public void addChildNode(Node child) {
-		if (collection == null) {
-			collection = new ArrayIndexedCollection();
-		}
+    /**
+     * Adds child in collection
+     *
+     * @param child child we want to add
+     */
+    public void addChildNode(Node child) {
+        if (collection == null) {
+            collection = new ArrayIndexedCollection();
+        }
+        collection.add( child );
+    }
 
-		collection.add(child);
-	}
+    /**
+     * Returns number of children
+     *
+     * @return int number of children
+     */
+    public int numberOfChildren() {
+        if (collection == null)
+            return 0;
+        return collection.size();
+    }
 
-	/**
-	 * Metoda koja vraca broj djece koji se nalazi u stablu
-	 * 
-	 * @return int - broj djece
-	 */
-	public int numberOfChildren() {
-		if(collection==null)
-			return 0;
-		return collection.size();
-	}
-
-	/**
-	 * Metoda koja vraca clana na odredenom indexu,odnosno iznimku
-	 * 
-	 * @param index
-	 * @return Node
-	 * @throws IndexOutOfBoundsException
-	 *             - ako index nije u rasponu
-	 */
-	public Node getChild(int index) {
-		return (Node) collection.get(index);
-	}
+    /**
+     * Return child at given index
+     *
+     * @param index index
+     * @return Node child
+     * @throws IndexOutOfBoundsException if index is out of bounds
+     */
+    public Node getChild(int index) {
+        return (Node) collection.get( index );
+    }
 }

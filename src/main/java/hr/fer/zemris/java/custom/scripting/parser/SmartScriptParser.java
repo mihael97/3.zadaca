@@ -2,391 +2,331 @@ package hr.fer.zemris.java.custom.scripting.parser;
 
 import hr.fer.zemris.java.custom.collections.ArrayIndexedCollection;
 import hr.fer.zemris.java.custom.collections.ObjectStack;
-import hr.fer.zemris.java.custom.scripting.elems.Element;
-import hr.fer.zemris.java.custom.scripting.elems.ElementConstantDouble;
-import hr.fer.zemris.java.custom.scripting.elems.ElementConstantInteger;
-import hr.fer.zemris.java.custom.scripting.elems.ElementFunction;
-import hr.fer.zemris.java.custom.scripting.elems.ElementOperator;
-import hr.fer.zemris.java.custom.scripting.elems.ElementString;
-import hr.fer.zemris.java.custom.scripting.elems.ElementVariable;
+import hr.fer.zemris.java.custom.scripting.elems.*;
 import hr.fer.zemris.java.custom.scripting.lexer.LexerException;
 import hr.fer.zemris.java.custom.scripting.lexer.SmartScriptLexer;
 import hr.fer.zemris.java.custom.scripting.lexer.Token;
 import hr.fer.zemris.java.custom.scripting.lexer.TypeToken;
-import hr.fer.zemris.java.custom.scripting.nodes.DocumentNode;
-import hr.fer.zemris.java.custom.scripting.nodes.EchoNode;
-import hr.fer.zemris.java.custom.scripting.nodes.ForLoopNode;
-import hr.fer.zemris.java.custom.scripting.nodes.Node;
-import hr.fer.zemris.java.custom.scripting.nodes.TextNode;
+import hr.fer.zemris.java.custom.scripting.nodes.*;
 
 /**
- * Javni razred koji implementira parser podataka. Pozivanjem lexera dolazimo do
- * dijelova sadrzaja niza(tokena) i u koracima sastavljamo strukturirano stablo
- * 
- * @author Mihael
+ * Parser
  *
+ * @author Mihael
  */
 public class SmartScriptParser {
-	/**
-	 * Referenca na Lexer koji ce nam proizvesti tokene iz zadanog niza
-	 */
-	SmartScriptLexer lexer;
+    /**
+     * Lexer
+     */
+    private SmartScriptLexer lexer;
 
-	/**
-	 * Refernca na stog na kojem ce se stavljati cvorovi (nodes)
-	 */
-	private ObjectStack stack;
+    /**
+     * Stack with nodes
+     */
+    private ObjectStack stack;
 
-	/**
-	 * Javni konstruktor koji inicijalizira Lexer s nizom kojeg zelimo parsirati
-	 * 
-	 * @param input
-	 *            - niz koji zelimo parsirati
-	 * @throws NullPointerException
-	 *             - ako je ulaz null
-	 */
-	public SmartScriptParser(String input) {
-		if (input == null) {
-			throw new NullPointerException("Naziv je null!");
-		}
+    /**
+     * Constructor
+     *
+     * @param input input String
+     * @throws NullPointerException if parameter is null
+     */
+    public SmartScriptParser(String input) {
+        if (input == null) {
+            throw new NullPointerException( "Naziv je null!" );
+        }
 
-		try {
-			lexer = new SmartScriptLexer(input);
-			getTokens();
-		} catch (LexerException e) {
-			throw new SmartScriptParserException(e.getMessage(), e);
+        try {
+            lexer = new SmartScriptLexer( input );
+            getTokens();
+        } catch (LexerException e) {
+            throw new SmartScriptParserException( e.getMessage(), e );
+        }
+    }
 
-		}
-	}
+    /**
+     * Generates document tree from lexer's tokens
+     */
+    private void getTokens() {
+        Token token;
+        stack = new ObjectStack();
+        stack.push( new DocumentNode() ); // stavljamo na stog dokument
 
-	/**
-	 * Metoda koja poziva proizvodnju tokena od Lexera sve dok ne primi null
-	 * vrijednost(kraj). Ako se u funkciji nalaze tagovi(FOR,ECHO),metoda poziva
-	 * specificnu metodu za razradu i stvaranje strukture
-	 */
-	private void getTokens() {
-		Token token;
-		stack = new ObjectStack();
-		stack.push(new DocumentNode()); // stavljamo na stog dokument
+        while ((token = lexer.getToken()) != null) {
+            if (token.getType() == TypeToken.TAGSTART) {
+                ArrayIndexedCollection collection = new ArrayIndexedCollection( 2 );
 
-		while ((token = lexer.getToken()) != null) {
-			if (token.getType() == TypeToken.TAGSTART) {
-				ArrayIndexedCollection collection = new ArrayIndexedCollection(2);
+                lexer.setState();
+                token = lexer.getToken();
 
-				lexer.setState();
-				token = checkID(lexer.getToken()); // identifikator
-				collection.add(token);
+                if (!checkID( token )) {
+                    throw new SmartScriptParserException( "Nemoguce prepoznati ime taga!" );
+                }
 
-				while ((token = lexer.getToken()) != null && token.getType() != TypeToken.TAGEND) {
-					collection.add(token);
-				}
+                collection.add( token );
 
-				if (token == null) {
-					break;
-				}
+                while ((token = lexer.getToken()) != null && token.getType() != TypeToken.TAGEND) {
+                    collection.add( token );
+                }
 
-				lexer.setState();
+                if (token == null) {
+                    break;
+                }
 
-				tagFunction(collection);
+                lexer.setState();
 
-			}
+                tagFunction( collection );
 
-			else if (token.getType() == TypeToken.END) {
-				endTag();
-			}
+            } else if (token.getType() == TypeToken.END) {
+                endTag();
+            } else {
+                TextNode node = new TextNode( (String) token.getValue() );
 
-			else {
-				TextNode node = new TextNode((String) token.getValue());
+                addNode( node );
+            }
+        }
 
-				addNode(node);
-			}
-		}
+        checkNumberOfNonEmptyLoops();
+    }
 
-		checkNumberOfNonEmptyLoops();
-	}
+    /**
+     * Checks if all non-empty tags are closed
+     *
+     * @throws SmartScriptParserException if there are non-empty tags
+     */
+    private void checkNumberOfNonEmptyLoops() {
+        if (stack.size() != 1) {
+            throw new SmartScriptParserException(
+                    "U programu je nedovoljno oznaka koje zatvaraju neprazne tagove! Na stogu je " + stack.size() );
+        }
+    }
 
-	/**
-	 * Metoda provjerava da li su nakon zavrsetka programa svi neprazni tagovi
-	 * zatvoreni
-	 * 
-	 * @throws SmartScriptParserException
-	 *             - ako je ostalo jedan ili vise neprazni tag
-	 */
-	private void checkNumberOfNonEmptyLoops() {
-		if (stack.size() != 1) {
-			throw new SmartScriptParserException(
-					"U programu je nedovoljno oznaka koje zatvaraju neprazne tagove! Na stogu je " + stack.size());
-		}
-	}
+    /**
+     * Checks if tag name is allowed
+     *
+     * @param token token
+     * @return true if token value is valid,otherwise false
+     */
+    private boolean checkID(Token token) {
 
-	/**
-	 * Metoda provjerava nalazi li se ime taga medu dopustenim imenima
-	 * 
-	 * @param token
-	 * @return string ako se nalazi,inace iznimka
-	 * 
-	 * @throws SmartScriptParserException
-	 *             - ako se ime taga ne moze prepoznati
-	 */
-	private Token checkID(Token token) {
+        return token.getValue().toString().trim().equals( "=" )
+                || token.getValue().toString().toUpperCase().trim().equals( "FOR" );
+    }
 
-		if (!token.getValue().toString().trim().equals("=")
-				&& !token.getValue().toString().toUpperCase().trim().equals("FOR")) {
-			throw new SmartScriptParserException("Nemoguce prepoznati ime taga!");
-		}
+    /**
+     * Calls function for FOR or ECHO node creating
+     *
+     * @param collection collection of elements
+     */
+    private void tagFunction(ArrayIndexedCollection collection) {
+        Token element = (Token) collection.get( 0 );
 
-		return token;
-	}
+        switch (element.toString().toUpperCase()) {
+            case "=":
+                echo( collection );
 
-	/**
-	 * Metoda prima kolekiciju s tokenima dobivenim od lexera i poziva odgovarajucu
-	 * metodu(za FOR petlju ili ECHO) koje stvaraju cvorove
-	 * 
-	 * @param collection
-	 *            - kolekcija elemnata
-	 */
-	private void tagFunction(ArrayIndexedCollection collection) {
-		// TODO Auto-generated method stub
-		Token element = (Token) collection.get(0);
+                break;
+            case "FOR":
+                FORLoop( collection );
 
-		switch (element.toString().toUpperCase()) {
-		case "=":
-			echo(collection);
+                break;
+            default:
+                break;
+        }
+    }
 
-			break;
-		case "FOR":
-			FORLoop(collection);
+    /**
+     * Adds children to last added stack's object
+     *
+     * @param node node we want to add
+     */
+    private void addNode(Node node) {
+        Node fromStack = (Node) stack.pop();
+        fromStack.addChildNode( node );
+        stack.push( fromStack );
+    }
 
-			break;
-		default:
-			break;
-		}
-	}
+    /**
+     * Generates echo node from tokens
+     *
+     * @param collection collection of Elements
+     **/
+    private void echo(ArrayIndexedCollection collection) {
+        ArrayIndexedCollection forReturn = new ArrayIndexedCollection( collection.size() );
 
-	/**
-	 * Metoda koja dodaje dijete zadnjem dodanom objektu na stogu
-	 *
-	 * @param stack
-	 *            - referenca na stog
-	 * @param node
-	 *            - cvor koji zelimo dodati kao dijete
-	 */
-	private void addNode(Node node) {
-		// TODO Auto-generated method stub
-		Node fromStack = (Node) stack.pop();
-		fromStack.addChildNode(node);
-		stack.push(fromStack);
-	}
+        for (int i = 1; i < collection.size(); i++) {
+            Element ele = makeElement( (Token) collection.get( i ) );
+            forReturn.add( ele );
+        }
 
-	/**
-	 * Metoda prima kolekciju {@link Token} ako se lexer nalazio u ECHO nacinu rada.
-	 * Iz dobivenih elemenata stvaraju se {@link Element} koji kasnije tvore cvor
-	 *
-	 * @param collection
-	 *            - kolekcija elemenat dobivena od tokena
-	 * 
-	 **/
-	private void echo(ArrayIndexedCollection collection) {
-		ArrayIndexedCollection forReturn = new ArrayIndexedCollection(collection.size());
+        EchoNode node = new EchoNode( copyArray( forReturn.toArray(), collection.size() ) );
 
-		for (int i = 1; i < collection.size(); i++) {
-			Element ele = makeElement((Token) collection.get(i));
-			forReturn.add(ele);
-		}
+        addNode( node );
+    }
 
-		EchoNode node = new EchoNode(copyArray(forReturn.toArray(), collection.size()));
+    /**
+     * Coverts Object array into Element array
+     *
+     * @param array Object array
+     * @param size  array size
+     * @return Element array
+     */
+    private Element[] copyArray(Object[] array, int size) {
+        Element[] forReturn = new Element[size];
+        int index = 0;
 
-		addNode(node);
-	}
+        for (Object obj : array) {
+            if (obj != null) {
+                forReturn[index++] = (Element) obj;
+            } else {
+                break;
+            }
+        }
 
-	/**
-	 * Metoda koja clanove polja objekata prebacuje u polje Elemenata zbog
-	 * prihvatljivijeg formata
-	 *
-	 * @param array
-	 *            - polje objekata koje je bilo pohranjeno u
-	 *            {@link ArrayIndexedCollection}
-	 * @param size
-	 *            - velicina objekata,kolicina
-	 * @return - polje {@link Element} koje se salju u konstruktor
-	 */
-	private Element[] copyArray(Object[] array, int size) {
-		Element[] forReturn = new Element[size];
-		int index = 0;
+        return forReturn;
+    }
 
-		for (Object obj : array) {
-			if (obj != null) {
-				forReturn[index++] = (Element) obj;
-			} else {
-				break;
-			}
-		}
+    /**
+     * Generates FORLoop
+     *
+     * @param collection collection of elements which FORLoop contains
+     * @return {@link ForLoopNode} generated ForLoopNode
+     * @throws SmartScriptParserException - if one of arguments if function or there is invalid number of arguments
+     */
+    private void FORLoop(ArrayIndexedCollection collection) throws SmartScriptParser {
 
-		return forReturn;
-	}
+        if (collection.size() > 5) {
+            throw new SmartScriptParserException( "Previse argumenata!" );
 
-	/**
-	 * Metoda koja analizira podatke dobivene od lexera i u konacnici inicijalizira
-	 * {@link ForLoopNode} koji ce biti dio stabla ForLoopNode moze imati 3 ili 4
-	 * argumenta,inace se baca iznimka o prevelikom/premalom broju tokena izlexera
-	 *
-	 * @param collection
-	 *            - kolekcija elemenata ako se lexer nalazio u FOR petlji
-	 * @return {@link ForLoopNode} koji ce biti dio strukture
-	 *
-	 * @throws SmartScriptParserException
-	 *             - ako je jedan od argumenata funkcija ili ako ima nedozvoljen
-	 *             broj argumenata
-	 */
-	private void FORLoop(ArrayIndexedCollection collection) {
+        } else if (collection.size() < 4) {
+            throw new SmartScriptParserException( "Premalo argumenata!" );
 
-		if (collection.size() > 5) {
-			throw new SmartScriptParserException("Previse argumenata!");
+        }
 
-		} else if (collection.size() < 4) {
-			throw new SmartScriptParserException("Premalo argumenata!");
+        String value = collection.get( 1 ).toString();
+        ElementVariable variable = new ElementVariable( checkName( value ) );
+        Element startExpression = makeElement( (Token) collection.get( 2 ) );
+        Element endExpression = makeElement( (Token) collection.get( 3 ) );
+        Element stepExpression = null;
 
-		}
+        if (collection.size() == 5) {
+            stepExpression = makeElement( (Token) collection.get( 4 ) );
+        }
 
-		String value = collection.get(1).toString();
-		ElementVariable variable = new ElementVariable(checkName(value));
-		Element startExpression = makeElement((Token) collection.get(2));
-		Element endExpression = makeElement((Token) collection.get(3));
-		Element stepExpression = null;
+        // argument cannot be function
+        if (startExpression instanceof ElementFunction || endExpression instanceof ElementFunction
+                || stepExpression instanceof ElementFunction) {
+            throw new SmartScriptParserException( "Jedan od argumenata je funkcija u FOR petlji!" );
+        }
 
-		if (collection.size() == 5) {
-			stepExpression = makeElement((Token) collection.get(4));
-		}
+        ForLoopNode node = new ForLoopNode( variable, startExpression, endExpression, stepExpression );
+        addNode( node );
+        stack.push( node );
+    }
 
-		// argument ne moze biti funkcija
-		if (startExpression instanceof ElementFunction || endExpression instanceof ElementFunction
-				|| stepExpression instanceof ElementFunction) {
-			throw new SmartScriptParserException("Jedan od argumenata je funkcija u FOR petlji!");
-		}
+    /**
+     * Checks if token is end tag
+     *
+     * @throws SmartScriptParserException if stack is empty after stack pop
+     */
+    private void endTag() throws SmartScriptParser {
+        Node node = (Node) stack.pop();
 
-		ForLoopNode node = new ForLoopNode(variable, startExpression, endExpression, stepExpression);
-		addNode(node);
-		stack.push(node);
-	}
+        if (stack.size() == 0) {
+            throw new SmartScriptParserException( "Stog je ostao prazan,previse {$END$} u odnosu na neprazne tagove!" );
+        }
+    }
 
-	/**
-	 * Ukoliko je kao token dosao End tag,metoda sa stoga skida jedan element i
-	 * provjerava je li stog prazan. Ako je iznimka,jer to znaci da imamo previse
-	 * tagova koji zatvaraju neprazne dijelove
-	 * 
-	 * @throws SmartScriptParserException
-	 *             - ako je stog nakon skidanja prazan
-	 */
-	private void endTag() {
-		// TODO Auto-generated method stub
-		@SuppressWarnings("unused")
-		Node node = (Node) stack.pop();
+    /**
+     * Generates element from token
+     *
+     * @param token token from lexer
+     * @return element form token
+     * @throws SmartScriptParser if variable's name is not valid or token cannot be parsed in any type
+     */
+    private Element makeElement(Token token) throws SmartScriptParser {
+        Element element = null;
 
-		if (stack.size() == 0) {
-			throw new SmartScriptParserException("Stog je ostao prazan,previse {$END$} u odnosu na neprazne tagove!");
-		}
-	}
+        switch (token.getType()) {
+            case INTEGER:
+                element = new ElementConstantInteger( (Integer) token.getValue() );
+                break;
 
-	/**
-	 * Metoda koja ovisno o dobivenom Tokenu iz lexera stvara novi element koji ce
-	 * poslije sastavljati cvorove. Metoda stvara elemente temeljem varijable Type
-	 * koju svaki Token ima
-	 *
-	 * @param token
-	 *            - token dobiven od lexera
-	 *
-	 * @return element koji nasljeduje {@link Element} ovisno o predanom argumentu
-	 */
-	private Element makeElement(Token token) {
-		Element element = null;
+            case DOUBLE:
+                element = new ElementConstantDouble( (Double) token.getValue() );
 
-		switch (token.getType()) {
-		case INTEGER:
-			element = new ElementConstantInteger((Integer) token.getValue());
-			break;
+                break;
+            case STRING:
+                element = new ElementString( (String) token.getValue() );
 
-		case DOUBLE:
-			element = new ElementConstantDouble((Double) token.getValue());
+                break;
+            case OPERATOR:
+                element = new ElementOperator( (String) token.getValue() );
 
-			break;
-		case STRING:
-			element = new ElementString((String) token.getValue());
+                break;
+            case FUNCTION:
+                element = new ElementFunction( (String) token.getValue() );
 
-			break;
-		case OPERATOR:
-			element = new ElementOperator((String) token.getValue());
+                break;
+            case VARIABLE:
+                if (!checkName( (String) token.getValue() )) {
+                    throw new SmartScriptParserException(
+                            "Ime varijable " + value + " se ne moze prihvatiti!" )
+                }
+                element = new ElementVariable( (String) token.getValue() );
 
-			break;
-		case FUNCTION:
-			element = new ElementFunction((String) token.getValue());
+                break;
+            default:
+                throw new SmartScriptParserException(
+                        "Nemoguce pretvoriti u niti jedan element! Razlog:" + token.getValue() );
 
-			break;
-		case VARIABLE:
-			element = new ElementVariable(checkName((String) token.getValue()));
+        }
 
-			break;
-		default:
-			throw new SmartScriptParserException(
-					"Nemoguce pretvoriti u niti jedan element! Razlog:" + token.getValue());
+        return element;
+    }
 
-		}
+    /**
+     * Checks if variable and function's name are in valid form<br>
+     * Name is in valid form if it starts with letter and after begin contans only letter,numbers and underscores
+     *
+     * @param value input String
+     * @return if name is valid true,otherwise false
+     */
+    private boolean checkName(String value) {
+        char[] nameArray = value.toCharArray();
+        SmartScriptParserException exception = new S;
 
-		return element;
-	}
+        if (!Character.isLetter( nameArray[0] )) {
+            return false;
+        } else {
+            for (int i = 1; i < nameArray.length; i++) {
+                char c = nameArray[i];
+                if (!(Character.isLetter( c ) || Character.isDigit( c ) || c == '_')) {
+                    return false;
+                }
+            }
+        }
 
-	/**
-	 * Metoda provjerava zadovoljavaju li imena varijabli i funkcija odredene
-	 * leksicke kriterije. Kriteriji: naziv mora zapoceti sa slovom,a kasnije se
-	 * mogu pojavljivati slova,brojevi i donje povlake("underscore") u neogranicenom
-	 * broju
-	 *
-	 * @param value
-	 *            - niz ciju validnost zelimo provjeriri
-	 * @return - predani argument ako zadovoljava uvjete,inace iznimku
-	 *
-	 * @throws SmartScriptParserException
-	 *             - ako niz ne zadovoljava kriterije
-	 */
-	private String checkName(String value) {
-		char[] nameArray = value.toCharArray();
-		SmartScriptParserException exception = new SmartScriptParserException(
-				"Ime varijable " + value + " se ne moze prihvatiti!");
+        return true;
+    }
 
-		if (!Character.isLetter(nameArray[0])) {
-			throw exception;
-		} else {
-			for (int i = 1; i < nameArray.length; i++) {
-				char c = nameArray[i];
-				if (!(Character.isLetter(c) || Character.isDigit(c) || c == '_')) {
-					throw exception;
-				}
-			}
-		}
+    /**
+     * Returns main DocumentNode
+     *
+     * @return {@link DocumentNode} document node
+     * @throws SmartScriptParserException document tree doesn't exist
+     */
+    public DocumentNode getDocumentNode() throws SmartScriptParser {
+        if (stack == null) {
+            throw new SmartScriptParserException( "Stog nije inicijaliziran!" );
+        } else {
+            Node node = null;
 
-		return value;
-	}
+            while (stack.size() != 0) {
+                node = (Node) stack.pop();
+            }
 
-	/**
-	 * Metoda koja vraca glavni cvor(Document Node) strukturiranog stabla. Ako
-	 * stablo jos nije izradeno,tj nema dodanih cvorova,metoda vraca
-	 * {@link SmartScriptParserException}
-	 *
-	 * @return {@link DocumentNode} ako on postoji,inace iznimka
-	 *
-	 * @throws SmartScriptParserException
-	 *             ako je stog neinicijaliziran
-	 */
-	public DocumentNode getDocumentNode() {
-		if (stack == null) {
-			throw new SmartScriptParserException("Stog nije inicijaliziran!");
-		} else {
-			Node node = null;
-
-			while (stack.size() != 0) {
-				node = (Node) stack.pop();
-			}
-
-			return (DocumentNode) node;
-		}
-	}
+            return (DocumentNode) node;
+        }
+    }
 }

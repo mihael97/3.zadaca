@@ -1,68 +1,63 @@
 package hr.fer.zemris.java.custom.scripting.lexer;
 
 /**
- * Razred koji predstavlja strukturu koju proizvodi lexer i salje ju parseru na
- * danju obradu
- * 
- * @author Mihael
+ * Token class
  *
+ * @author Mihael
  */
 public class Token {
-	/**
-	 * Referenca na {@link TypeToken} - vrstu podataka koju token sadrzi
-	 */
-	private final TypeToken type;
-	/**
-	 * Vrijednost pohranjena u tokemu
-	 */
-	private final Object value;
 
-	/**
-	 * Konstruktor koji stavara novi token
-	 * 
-	 * @param type
-	 *            - vrsta tokena
-	 * @param value
-	 *            - vrijednost tokena
-	 */
-	public Token(TypeToken type, Object value) {
-		super();
-		this.type = type;
-		this.value = value;
-	}
+    /**
+     * Token type
+     */
+    private final TypeToken type;
+    /**
+     * Token value
+     */
+    private final Object value;
 
-	/**
-	 * Metoda koja vraca vrstu tokena
-	 * 
-	 * @return {@link TypeToken} - vrsta tokena
-	 */
-	public TypeToken getType() {
-		return type;
-	}
+    /**
+     * Constructor
+     *
+     * @param type  type
+     * @param value value
+     */
+    public Token(TypeToken type, Object value) {
+        super();
+        this.type = type;
+        this.value = value;
+    }
 
-	/**
-	 * Metoda koja vraca vrijednost cvora. Moguci oblici Objekt su Double,Integer i
-	 * String
-	 * 
-	 * @return vrijednost cvora
-	 */
-	public Object getValue() {
-		return value;
-	}
+    /**
+     * Returns token's type
+     *
+     * @return {@link TypeToken}
+     */
+    public TypeToken getType() {
+        return type;
+    }
 
-	/**
-	 * Metoda koja vraca prikaz Tokena u Stringu. Prikaz tokena implementira se kao
-	 * vrijednost tokena u obliku Stringa
-	 * 
-	 * @return String - vrijednost tolena
-	 */
-	@Override
-	public String toString() {
-		if (value instanceof Integer || value instanceof Double)
-			return value.toString();
-		else {
-			return (String) value;
-		}
-	}
+    /**
+     * Token's value
+     *
+     * @return token's value
+     */
+    public Object getValue() {
+        return value;
+    }
+
+    /**
+     * Token's String representation
+     *
+     * @return string representation
+     */
+    @Override
+    public String toString() {
+        if (value instanceof Integer || value instanceof Double)
+            return value.toString();
+        else {
+            return (String) value;
+        }
+    }
 
 }

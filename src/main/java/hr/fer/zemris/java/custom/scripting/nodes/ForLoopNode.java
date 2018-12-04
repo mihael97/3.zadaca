@@ -6,133 +6,131 @@ import hr.fer.zemris.java.custom.scripting.elems.ElementVariable;
 import hr.fer.zemris.java.custom.scripting.parser.SmartScriptParserException;
 
 /**
- * Razred koji predstavlja for petlju i nasljeduje klasu Node. Varijable su
- * naziv varijable,pocetni izraz,zavrsni izraz i izraz koji predstavlja korak.
- * Prve tri vrijednosti ne mogu biti null,dok cetvrta moze
- * 
- * @author Mihael
+ * For loop<br>
+ * For loop must have three parameters:<br>
+ * <ul>
+ * <li>variable name</li>
+ * <li>initial expression</li>
+ * <li>final expression</li>
+ * </ul><br>
+ * Loop can also have step expression parameter
  *
+ * @author Mihael
  */
 public class ForLoopNode extends Node {
-	/**
-	 * Vrijednost
-	 */
-	private ElementVariable variable;
-	/**
-	 * Pocetni izraz
-	 */
-	private Element startExpression;
-	/**
-	 * Zavrsni izraz
-	 */
-	private Element endExpression;
-	/**
-	 * 'Preskakuci izraz'
-	 */
-	private Element stepExpression;
+    /**
+     * Value
+     */
+    private ElementVariable variable;
+    /**
+     * Initial expression
+     */
+    private Element initialExpression;
+    /**
+     * Final expression
+     */
+    private Element finalExpression;
+    /**
+     * Loop expression
+     */
+    private Element stepExpression;
 
-	/**
-	 * Javni konstruktor koji inicijalizira sve varijable
-	 * 
-	 * @param variable
-	 *            - naziv varijable
-	 * @param startExpression
-	 *            - pocetni izraz
-	 * @param endExpression
-	 *            - zavrsni izraz
-	 * @param stepExpression
-	 *            - izraz koji predstavlja korak
-	 * 
-	 * @throws NullPointerException
-	 *             - ako je jedan od prva tri izraza null
-	 */
-	public ForLoopNode(ElementVariable variable, Element startExpression, Element endExpression,
-			Element stepExpression) {
-		super();
-		if (variable == null || startExpression == null || endExpression == null) {
-			throw new SmartScriptParserException("Jedan od predanih argumenata je null!");
-		}
+    /**
+     * Constructor
+     *
+     * @param variable          variable name
+     * @param initialExpression initial expression
+     * @param finalExpression   final expression
+     * @param stepExpression    step
+     * @throws NullPointerException if one of first three parameters in null
+     */
+    public ForLoopNode(ElementVariable variable, Element initialExpression, Element finalExpression,
+                       Element stepExpression) {
+        super();
+        if (variable == null || initialExpression == null || finalExpression == null) {
+            throw new SmartScriptParserException( "Jedan od predanih argumenata je null!" );
+        }
 
-		this.variable = variable;
-		this.startExpression = startExpression;
-		this.endExpression = endExpression;
-		this.stepExpression = stepExpression;
-	}
+        this.variable = variable;
+        this.initialExpression = initialExpression;
+        this.finalExpression = finalExpression;
+        this.stepExpression = stepExpression;
+    }
 
-	/**
-	 * Metoda koja vraca naziv varijable
-	 * 
-	 * @return {@link ElementVariable}
-	 */
-	public ElementVariable getVariable() {
-		return variable;
-	}
+    /**
+     * Variable name
+     *
+     * @return {@link ElementVariable} variable name
+     */
+    public ElementVariable getVariable() {
+        return variable;
+    }
 
-	/**
-	 * Metoda koja vraca pocetni izraz
-	 * 
-	 * @return {@link Element}
-	 */
-	public Element getStartExpression() {
-		return startExpression;
-	}
+    /**
+     * Initial expression
+     *
+     * @return {@link Element} initial expression
+     */
+    public Element getInitialExpression() {
+        return initialExpression;
+    }
 
-	/**
-	 * Metoda koja vraca zavrsni izraz
-	 * 
-	 * @return {@link Element}
-	 */
-	public Element getEndExpression() {
-		return endExpression;
-	}
+    /**
+     * End expression
+     *
+     * @return {@link Element} end expression
+     */
+    public Element getFinalExpression() {
+        return finalExpression;
+    }
 
-	/**
-	 * Metoda koja vraca izraz koji predstavlja korak
-	 * 
-	 * @return {@link Element}
-	 */
-	public Element getStepExpression() {
-		return stepExpression;
-	}
+    /**
+     * Loop step
+     *
+     * @return {@link Element}
+     */
+    public Element getStepExpression() {
+        return stepExpression;
+    }
 
-	/**
-	 * Metoda koja vraca ispis FORN u prihvatljivom obliku
-	 * 
-	 * @return String kao ispis FOR petlje
-	 */
-	@Override
-	public String toString() {
-		StringBuilder string = new StringBuilder().append("{$ FOR ").append(variable.asText()).append(" ");
-		
-		if(startExpression instanceof ElementString) {
-			string.append(((ElementString) startExpression).forParse());
-		} else {
-			string.append(startExpression.asText());
-		}
-		
-		string.append(" ");
-		
-		if(endExpression instanceof ElementString) {
-			string.append(((ElementString) endExpression).forParse());
-		} else {
-			string.append(endExpression.asText());
-		}
-		
-		string.append(" ");
-		
-		if (stepExpression != null) {
-			if(stepExpression instanceof ElementString) {
-				string.append(((ElementString) stepExpression).forParse());
-			} else {
-				string.append(stepExpression.asText());
-			}
-			
-			string.append(" ");
-		}
+    /**
+     * Returns String representation of FOR loop
+     *
+     * @return String string represenation
+     */
+    @Override
+    public String toString() {
+        StringBuilder string = new StringBuilder().append( "{$ FOR " ).append( variable.asText() ).append( " " );
 
-		string.append("$}");
+        if (initialExpression instanceof ElementString) {
+            string.append( ((ElementString) initialExpression).forParse() );
+        } else {
+            string.append( initialExpression.asText() );
+        }
 
-		return string.toString();
-	}
+        string.append( " " );
+
+        if (finalExpression instanceof ElementString) {
+            string.append( ((ElementString) finalExpression).forParse() );
+        } else {
+            string.append( finalExpression.asText() );
+        }
+
+        string.append( " " );
+
+        if (stepExpression != null) {
+            if (stepExpression instanceof ElementString) {
+                string.append( ((ElementString) stepExpression).forParse() );
+            } else {
+                string.append( stepExpression.asText() );
+            }
+
+            string.append( " " );
+        }
+
+        string.append( "$}" );
+
+        return string.toString();
+    }
 
 }

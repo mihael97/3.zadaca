@@ -1,66 +1,61 @@
 package hr.fer.zemris.java.custom.scripting.nodes;
 
-import java.util.Arrays;
-
 import hr.fer.zemris.java.custom.scripting.elems.Element;
 import hr.fer.zemris.java.custom.scripting.elems.ElementString;
 
+import java.util.Arrays;
+
 /**
- * Razred koji implementira naredbu koja stvara neki izlaz. Nasljeduje klasu
- * Node. Sadrzi polje Elementa
- * 
- * @author Mihael
+ * Echo node
  *
+ * @author Mihael
  */
 public class EchoNode extends Node {
-	/**
-	 * Elementi
-	 */
-	Element[] elements;
+    /**
+     * Elements
+     */
+    Element[] elements;
 
-	/**
-	 * Javni konstruktor koji prima referencu na elemente i inicijalizira ih
-	 * 
-	 * @param elements
-	 *            - elementi
-	 */
-	public EchoNode(Element[] elements) {
-		super();
-		this.elements = Arrays.copyOf(elements, elements.length);
-	}
+    /**
+     * Constrcutor
+     *
+     * @param elements elements
+     */
+    public EchoNode(Element[] elements) {
+        super();
+        this.elements = Arrays.copyOf( elements, elements.length );
+    }
 
-	/**
-	 * Metoda koja vraca sve elemente u obliku polje Elemenata
-	 * 
-	 * @return Element[]
-	 */
-	public Element[] getElements() {
-		return elements;
-	}
+    /**
+     * Returns elements
+     *
+     * @return elements
+     */
+    public Element[] getElements() {
+        return elements;
+    }
 
-	/**
-	 *
-	 * Metoda koja vraca ispis EchoNodea sa svim elementima u primjerenom obliku
-	 * 
-	 * @return string ispis svih elemenata
-	 *
-	 */
-	@Override
-	public String toString() {
-		StringBuilder string = new StringBuilder().append("{$= ");
+    /**
+     * Returns String representation of EchoNode
+     *
+     * @return string string representation
+     */
+    @Override
+    public String toString() {
+        StringBuilder string = new StringBuilder().append( "{$= " );
 
-		for (Element ele : elements) {
-			if(ele!=null) {
-				if(ele instanceof ElementString) {
-					string.append(((ElementString) ele).forParse()+" ");
-				} else {
-					string.append(ele.asText()+" ");
-				}
-			}
-		}
+        for (Element ele : elements) {
+            if (ele != null) {
+                if (ele instanceof ElementString) {
+                    string.append( ((ElementString) ele).forParse() + " " );
+                } else {
+                    string.append( ele.asText() + " " );
+                }
+            }
+        }
 
-		string.append("$}");
+        string.append( "$}" );
 
-		return string.toString();
-	}
+        return string.toString();
+    }
 }

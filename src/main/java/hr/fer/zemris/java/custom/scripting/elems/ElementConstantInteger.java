@@ -1,37 +1,33 @@
 package hr.fer.zemris.java.custom.scripting.elems;
 
 /**
- * Razred koji implementira cijelobrojnu vrijednost
- * 
- * @author Mihael
+ * Integer element
  *
+ * @author Mihael
  */
 public class ElementConstantInteger extends Element {
-	/**
-	 * Vrijednost u obliku cijelog broja
-	 */
-	private int value;
+    /**
+     * Integer value
+     */
+    private int value;
 
-	/**
-	 * Javni konstruktor koji inicijalizira vrijednost cijelog broja
-	 * 
-	 * @param value
-	 *            - vrijednost
-	 */
-	public ElementConstantInteger(int value) {
-		// TODO Auto-generated constructor stub
-		this.value = value;
-	}
+    /**
+     * Constructor
+     *
+     * @param value value
+     */
+    public ElementConstantInteger(int value) {
+        this.value = value;
+    }
 
-	/**
-	 * Metoda vraca primitivnu vrijednost integera u obliku Stringa
-	 * 
-	 * @return String
-	 */
-	@Override
-	public String asText() {
-		// TODO Auto-generated method stub
-		return Integer.valueOf(value).toString();
-	}
+    /**
+     * Returns value in String format
+     *
+     * @return String
+     */
+    @Override
+    public String asText() {
+        return Integer.valueOf( value ).toString();
+    }
 
 }
